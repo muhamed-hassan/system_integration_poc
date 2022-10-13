@@ -1,0 +1,11 @@
+server:
+  port: 8081
+  
+backendSystem:
+   baseUrl: 'http://localhost:8080/v1/'  
+
+webClientConfigs:
+   connectTimeoutMillis: 5000
+   readTimeoutMillis: 5000
+   writeTimeoutMillis: 5000
+   responseTimeoutMillis: 5000
