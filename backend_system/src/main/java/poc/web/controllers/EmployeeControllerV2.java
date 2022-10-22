@@ -1,5 +1,6 @@
 package poc.web.controllers;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -24,32 +25,29 @@ import poc.persistence.models.EmployeeEntity;
 import poc.web.models.NewEmployee;
 import poc.web.models.SavedEmployee;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 @RestController
-@RequestMapping("v1/employees")
+@RequestMapping("v2/employees")
 @Validated
-public class EmployeeControllerV1 {
+public class EmployeeControllerV2 {
 	
 	private final EmployeeRepository employeeRepository;
 
-	public EmployeeControllerV1(EmployeeRepository employeeRepository) {
+	public EmployeeControllerV2(EmployeeRepository employeeRepository) {
 		this.employeeRepository = employeeRepository;
 	}
 		
 	@GetMapping("{id}")
-	public ResponseEntity<Mono<SavedEmployee>> findById(@PathVariable int id) {
+	public ResponseEntity<SavedEmployee> findById(@PathVariable int id) {
 		var employeeEntity = employeeRepository.findById(id);
 		var webModel = new SavedEmployee()
 							.withId(employeeEntity.getId())
 							.withName(employeeEntity.getName())
 							.withTitle(employeeEntity.getTitle());
-		return ResponseEntity.ok(Mono.just(webModel));
+		return ResponseEntity.ok(webModel);
 	}
 	
 	@GetMapping
-	public ResponseEntity<Flux<SavedEmployee>> findByPage
+	public ResponseEntity<List<SavedEmployee>> findByPage
 			(@RequestParam int pageNumber, @RequestParam int pageSize) {
 		var webModels = employeeRepository.findByPage(pageNumber, pageSize)
 											.stream()
@@ -58,21 +56,21 @@ public class EmployeeControllerV1 {
 																		.withName(employeeEntity.getName())
 																		.withTitle(employeeEntity.getTitle()))
 											.collect(Collectors.toList());		
-		return ResponseEntity.ok(Flux.fromIterable(webModels));
+		return ResponseEntity.ok(webModels);
 	}
 	
 	@GetMapping("client_error")
-	public ResponseEntity<Mono<Void>> doClientErrorWithGET() {
+	public ResponseEntity<Void> doClientErrorWithGET() {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
 	
 	@GetMapping("server_error")
-	public ResponseEntity<Mono<Void>> doServerErrorWithGET() {
+	public ResponseEntity<Void> doServerErrorWithGET() {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
 	
 	@GetMapping("other_error")
-	public ResponseEntity<Mono<Void>> doOtherErrorWithGET() 
+	public ResponseEntity<Void> doOtherErrorWithGET() 
 			throws InterruptedException {
 		TimeUnit.SECONDS.sleep(10);
 		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
@@ -80,27 +78,27 @@ public class EmployeeControllerV1 {
 	
 	/* ******************************************************************************************************** */	
 	@PostMapping
-	public ResponseEntity<Mono<Void>> save(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Void> save(@Valid @RequestBody NewEmployee newEmployee) {
 		var employeeEntity = new EmployeeEntity()
 				.withName(newEmployee.getName())
 				.withTitle(newEmployee.getTitle());
-		return ResponseEntity.created(UriComponentsBuilder.fromPath("v1/employees/{id}")
+		return ResponseEntity.created(UriComponentsBuilder.fromPath("v2/employees/{id}")
                 	.build(employeeRepository.save(employeeEntity)))
 				.build();
 	}
 	
 	@PostMapping("client_error")
-	public ResponseEntity<Mono<Void>> doClientErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Void> doClientErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
 	
 	@PostMapping("server_error")
-	public ResponseEntity<Mono<Void>> doServerErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Void> doServerErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
 	
 	@PostMapping("other_error")
-	public ResponseEntity<Mono<Void>> doOtherErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) 
+	public ResponseEntity<Void> doOtherErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) 
 			throws InterruptedException {
 		TimeUnit.SECONDS.sleep(10);
 		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
@@ -108,23 +106,23 @@ public class EmployeeControllerV1 {
 	
 	/* ******************************************************************************************************** */
 	@DeleteMapping("{id}")
-	public ResponseEntity<Mono<Void>> deleteById(@PathVariable int id) {
+	public ResponseEntity<Void> deleteById(@PathVariable int id) {
 		employeeRepository.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@DeleteMapping("client_error")
-	public ResponseEntity<Mono<Void>> doClientErrorWithDELETE() {
+	public ResponseEntity<Void> doClientErrorWithDELETE() {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
 	
 	@DeleteMapping("server_error")
-	public ResponseEntity<Mono<Void>> doServerErrorWithDELETE() {
+	public ResponseEntity<Void> doServerErrorWithDELETE() {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
 	
 	@DeleteMapping("other_error")
-	public ResponseEntity<Mono<Void>> doOtherErrorWithDELETE() 
+	public ResponseEntity<Void> doOtherErrorWithDELETE() 
 			throws InterruptedException {
 		TimeUnit.SECONDS.sleep(10);
 		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
@@ -132,7 +130,7 @@ public class EmployeeControllerV1 {
 	
 	/* ******************************************************************************************************** */
 	@PatchMapping("{id}")
-	public ResponseEntity<Mono<Void>> updateById(@PathVariable int id, @Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Void> updateById(@PathVariable int id, @Valid @RequestBody NewEmployee newEmployee) {
 		var employeeEntity = new EmployeeEntity()
 				.withId(id)
 				.withName(newEmployee.getName())
@@ -142,20 +140,20 @@ public class EmployeeControllerV1 {
 	}
 	
 	@PatchMapping("client_error")
-	public ResponseEntity<Mono<Void>> doClientErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Void> doClientErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
 	
 	@PatchMapping("server_error")
-	public ResponseEntity<Mono<Void>> doServerErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Void> doServerErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
 	
 	@PatchMapping("other_error")
-	public ResponseEntity<Mono<Void>> doOtherErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) 
+	public ResponseEntity<Void> doOtherErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) 
 			throws InterruptedException {
 		TimeUnit.SECONDS.sleep(10);
 		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
 	}
-	
+
 }
