@@ -30,32 +30,32 @@ public class WebClientConfig {
 	@Autowired
 	private Displayer displayer;
 	
-	@Value("${backendSystem.baseUrl}")
+	@Value("${backendSystem.baseUrlV1}")
 	private String backendSystemBaseUrl;
 	
 	@Value("${webClientConfigs.connectTimeoutMillis}")
-	private int webClientConfigsConnectTimeoutMillis;
+	private int connectTimeoutMillis;
 	
 	@Value("${webClientConfigs.readTimeoutMillis}")
-	private int webClientConfigsReadTimeoutMillis;
+	private int readTimeoutMillis;
 	
 	@Value("${webClientConfigs.writeTimeoutMillis}")
-	private int webClientConfigsWriteTimeoutMillis;
+	private int writeTimeoutMillis;
 	
 	@Value("${webClientConfigs.responseTimeoutMillis}")
-	private int webClientConfigsResponseTimeoutMillis;
+	private int responseTimeoutMillis;
 
 	@Bean
 	public WebClient webClient() {
 		displayer.print(">>> Initiating webClient ...");
-		
-		var readTimeoutHandler = new ReadTimeoutHandler(webClientConfigsReadTimeoutMillis, TimeUnit.MILLISECONDS);
-		var writeTimeoutHandler = new WriteTimeoutHandler(webClientConfigsWriteTimeoutMillis, TimeUnit.MILLISECONDS);		
+
+		var readTimeoutHandler = new ReadTimeoutHandler(readTimeoutMillis, TimeUnit.MILLISECONDS);
+		var writeTimeoutHandler = new WriteTimeoutHandler(writeTimeoutMillis, TimeUnit.MILLISECONDS);		
 		Consumer<? super Connection> connectionHandler = connection -> connection.addHandlerLast(readTimeoutHandler)
 																			.addHandlerLast(writeTimeoutHandler);
 		var httpClient = HttpClient.create()
-								.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, webClientConfigsConnectTimeoutMillis)
-								.responseTimeout(Duration.ofMillis(webClientConfigsResponseTimeoutMillis))
+								.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis)
+								.responseTimeout(Duration.ofMillis(responseTimeoutMillis))
 								.doOnConnected(connectionHandler);		
 		
 		return WebClient.builder()

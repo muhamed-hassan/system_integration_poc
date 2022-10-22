@@ -7,7 +7,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import poc.integration.clients.BackendSystemClient;
+import poc.integration.clients.BackendSystemClientV1;
 import poc.view.Displayer;
 
 import reactor.core.publisher.Flux;
@@ -20,7 +20,7 @@ public class PostStartupRunner implements ApplicationRunner {
 	private Displayer displayer;
 	
 	@Autowired
-	private BackendSystemClient backendSystemClient;
+	private BackendSystemClientV1 backendSystemClient;
 	
 	@Override
 	public void run(ApplicationArguments applicationArguments) 

@@ -8,7 +8,7 @@ import poc.view.Displayer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class BaseClient {
+public class BaseClientV1 {
 
 	@Autowired
 	private WebClient webClient;

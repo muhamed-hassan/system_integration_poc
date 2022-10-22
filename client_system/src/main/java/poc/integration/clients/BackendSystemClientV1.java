@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-public class BackendSystemClient extends BaseClient {
+public class BackendSystemClientV1 extends BaseClientV1 {
 	
 	private static final String OTHER_ERROR_REQUEST_PATH = "/employees/other_error";
 	private static final String SERVER_ERROR_REQUEST_PATH = "/employees/server_error";
