@@ -65,17 +65,11 @@ public class WebClientConfig {
 				.clientConnector(new ReactorClientHttpConnector(httpClient))
 				.filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
 					displayer.print(">>> " + clientRequest.method() + ": HTTP Request is initiated ...");
-					clientRequest.headers()
-								.entrySet()
-								.forEach(header -> displayer.print(header.getKey() + " -> " + header.getValue().toString()));
+					displayer.print(clientRequest.headers().entrySet());
 			        return Mono.just(clientRequest);}))
 				.filter(ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-					displayer.print("<<< Http Response is coming ...");
-					clientResponse.headers()
-								.asHttpHeaders()
-								.entrySet()
-								.forEach(header -> displayer.print(header.getKey() + " -> " + header.getValue().toString()));
-					displayer.print("Http Status Code: " + clientResponse.statusCode());	
+					displayer.print("<<< Http Response is received with " + clientResponse.statusCode());
+					displayer.print(clientResponse.headers().asHttpHeaders().entrySet());	
 					return Mono.just(clientResponse);}))
 				.build();
 	}

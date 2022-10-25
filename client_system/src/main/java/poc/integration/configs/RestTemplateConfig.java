@@ -1,7 +1,6 @@
 package poc.integration.configs;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.Netty4ClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,6 +36,7 @@ public class RestTemplateConfig {
 	
 	@Bean
 	public RestTemplate restTemplate() {		
+		displayer.print(">>> Initiating restTemplate ...");		
 		return new RestTemplateBuilder()
 					.rootUri(backendSystemBaseUrl)
 					.defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -44,11 +45,15 @@ public class RestTemplateConfig {
 					.setReadTimeout(Duration.ofMillis(readTimeoutMillis))
 					.errorHandler(new ResponseErrorHandlerImpl())
 					.interceptors((HttpRequest request, byte[] body, ClientHttpRequestExecution execution) -> {
-						displayer.print(">>> " + request.getMethod() + ": HTTP Request is initiated ...");						
-						request.getHeaders()
-								.entrySet()
-								.forEach(header -> displayer.print(header.getKey() + " -> " + header.getValue().toString()));
-						return execution.execute(request, body);})		
+						displayer.print(">>> " + request.getMethod() + ": HTTP Request is initiated ...");				
+						displayer.print(request.getHeaders().entrySet());
+						var response = execution.execute(request, body);
+						if (response.getStatusCode().is2xxSuccessful()) {
+							displayer.print("<<< Http Response is received with " + response.getStatusCode());
+							displayer.print(response.getHeaders().entrySet());
+						}						
+						return response;})	
+					.requestFactory(Netty4ClientHttpRequestFactory.class)
 					.build();
 	}
 	
@@ -63,8 +68,10 @@ public class RestTemplateConfig {
 		@Override
 		public void handleError(ClientHttpResponse response) 
 				throws IOException {
-			displayer.print(response.getStatusCode() + " | " 
-				+ new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8));
+			displayer.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+			displayer.print("ERROR:: Http Response is received with " + response.getStatusCode());
+			displayer.print(response.getHeaders().entrySet());
+			displayer.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		}
 		
 	}

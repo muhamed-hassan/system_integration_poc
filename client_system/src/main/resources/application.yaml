@@ -3,7 +3,7 @@ server:
   
 backendSystem:
    baseUrlV1: 'http://localhost:8080/v1/'  
-   baseUrlV2: 'http://localhost:8080/v2/'
+   baseUrlV2: 'http://localhost:8080/v2'
 
 webClientConfigs:
    connectTimeoutMillis: 5000

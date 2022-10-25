@@ -17,7 +17,7 @@ public class BaseClientV1 {
 	private Displayer displayer;
 	
 	protected <T> Mono<T> getSingle(String requestPath, Class<T> responseBodyType) {
-		displayer.print("GET BaseClient::getSingle()");
+		displayer.print("GET BaseClientV1::getSingle()");
 		return webClient.get()
 						.uri(requestPath)
 						.retrieve()
@@ -25,7 +25,7 @@ public class BaseClientV1 {
 	}
 	
 	protected <T> Flux<T> getList(String requestPath, Class<T> responseBodyType) {
-		displayer.print("GET BaseClient::getList()");
+		displayer.print("GET BaseClientV1::getList()");
 		return webClient.get()
 						.uri(requestPath)
 						.retrieve()
@@ -33,7 +33,7 @@ public class BaseClientV1 {
 	}
 	
 	protected Mono<Void> getWithError(String requestPath) {
-		displayer.print("GET BaseClient::getWithError()");
+		displayer.print("GET BaseClientV1::getWithError()");
 		return webClient.get()
 						.uri(requestPath)
 						.retrieve()
@@ -42,7 +42,7 @@ public class BaseClientV1 {
 	
 	/* ******************************************************************************************************** */	
 	protected <T> Mono<Void> post(String requestPath, T payload) {
-		displayer.print("POST BaseClient::post()");
+		displayer.print("POST BaseClientV1::post()");
 		return webClient.post()
 						.uri(requestPath)
 						.body(Mono.just(payload), payload.getClass())
@@ -52,7 +52,7 @@ public class BaseClientV1 {
 	
 	/* ******************************************************************************************************** */	
 	protected Mono<Void> delete(String requestPath) {
-		displayer.print("DELETE BaseClient::delete()");
+		displayer.print("DELETE BaseClientV1::delete()");
 		return webClient.delete()
 						.uri(requestPath)
 						.retrieve()
@@ -61,7 +61,7 @@ public class BaseClientV1 {
 	
 	/* ******************************************************************************************************** */	
 	protected <T> Mono<Void> patch(String requestPath, T payload) {
-		displayer.print("PATCH BaseClient::patch()");
+		displayer.print("PATCH BaseClientV1::patch()");
 		return webClient.patch()
 						.uri(requestPath)
 						.body(Mono.just(payload), payload.getClass())
