@@ -1,4 +1,4 @@
-package poc.web.error_handler;
+package poc.interfaces.rest.error_handler;
 
 import java.util.Collections;
 import java.util.Map;
@@ -15,7 +15,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 @RestControllerAdvice
-public class WebErrorHandler {
+public class RestErrorHandler {
 
 	private static final String ERROR = "error";
 

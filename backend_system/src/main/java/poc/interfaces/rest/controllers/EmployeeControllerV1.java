@@ -1,4 +1,4 @@
-package poc.web.controllers;
+package poc.interfaces.rest.controllers;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -21,8 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import poc.persistence.daos.EmployeeRepository;
 import poc.persistence.models.EmployeeEntity;
-import poc.web.models.NewEmployee;
-import poc.web.models.SavedEmployee;
+import poc.interfaces.rest.models.NewEmployee;
+import poc.interfaces.rest.models.SavedEmployee;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

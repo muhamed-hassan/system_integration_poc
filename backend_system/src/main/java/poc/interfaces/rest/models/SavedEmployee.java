@@ -1,4 +1,4 @@
-package poc.web.models;
+package poc.interfaces.rest.models;
 
 public class SavedEmployee {
 
