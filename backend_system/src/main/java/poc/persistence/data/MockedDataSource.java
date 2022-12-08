@@ -20,10 +20,10 @@ public class MockedDataSource {
 		System.out.println("initDataSource is starting ...");		
 		employees = new ArrayList<>();
 		for (int cursor = 1; cursor <= 100; cursor++) {
-			var employee = new EmployeeEntity()
-					.withId(cursor)
-					.withName("name _ " + cursor)
-					.withTitle("title _ " + cursor);
+			var employee = new EmployeeEntity();
+			employee.setId(cursor);
+			employee.setName("name _ " + cursor);
+			employee.setTitle("title _ " + cursor);		
 			employees.add(employee);
 		}		
 		System.out.println("100 elements get allocated 👍");

@@ -12,39 +12,34 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebInputException;
 
-import reactor.core.publisher.Mono;
-
 @RestControllerAdvice
 public class RestErrorHandler {
 
 	private static final String ERROR = "error";
 
 	@ExceptionHandler
-	public ResponseEntity<Mono<Map<String, String>>> handleServerWebInputException(ServerWebInputException exception) {
+	public ResponseEntity<Map<String, String>> handleServerWebInputException(ServerWebInputException exception) {
 		var message = exception.getCause() == null ? 
 				"Unable to process this request." : exception.getCause().getMessage();
-		var error = Mono.just(Collections.singletonMap(ERROR, message));
-		System.err.println(">>> " + message);
+		var error = Collections.singletonMap(ERROR, message);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Mono<Map<String, String>>> handleWebExchangeBindException(WebExchangeBindException exception) {
+	public ResponseEntity<Map<String, String>> handleWebExchangeBindException(WebExchangeBindException exception) {
 		var message = exception.getAllErrors()
 				.stream()
 				.map(ObjectError::getDefaultMessage)
 				.collect(Collectors.joining(" and, "));
-		var error = Mono.just(Collections.singletonMap(ERROR, message));
-		System.err.println(">>> " + message);
+		var error = Collections.singletonMap(ERROR, message);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Mono<Map<String, String>>> handleGeneralException(Exception exception) {
+	public ResponseEntity<Map<String, String>> handleGeneralException(Exception exception) {
 		var message = exception.getMessage() == null ? 
 				"Unable to process this request." : exception.getMessage();
-		var error = Mono.just(Collections.singletonMap(ERROR, message));
-		System.err.println(">>> " + message);
+		var error = Collections.singletonMap(ERROR, message);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	}
 

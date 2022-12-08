@@ -39,24 +39,27 @@ public class EmployeeControllerV2 {
 	@GetMapping("{id}")
 	public ResponseEntity<SavedEmployee> findById(@PathVariable int id) {
 		var employeeEntity = employeeRepository.findById(id);
-		var webModel = new SavedEmployee()
-							.withId(employeeEntity.getId())
-							.withName(employeeEntity.getName())
-							.withTitle(employeeEntity.getTitle());
-		return ResponseEntity.ok(webModel);
+		var response = new SavedEmployee();
+		response.setId(id);
+		response.setName(employeeEntity.getName());
+		response.setTitle(employeeEntity.getTitle());
+		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping
 	public ResponseEntity<List<SavedEmployee>> findByPage
 			(@RequestParam int pageNumber, @RequestParam int pageSize) {
-		var webModels = employeeRepository.findByPage(pageNumber, pageSize)
+		var response = employeeRepository.findByPage(pageNumber, pageSize)
 											.stream()
-											.map(employeeEntity -> new SavedEmployee()
-																		.withId(employeeEntity.getId())
-																		.withName(employeeEntity.getName())
-																		.withTitle(employeeEntity.getTitle()))
+											.map(employeeEntity -> {
+												var savedEmployee = new SavedEmployee();
+												savedEmployee.setId(employeeEntity.getId());
+												savedEmployee.setName(employeeEntity.getName());
+												savedEmployee.setTitle(employeeEntity.getTitle());
+												return savedEmployee;
+											})
 											.collect(Collectors.toList());		
-		return ResponseEntity.ok(webModels);
+		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("client_error")
@@ -79,9 +82,9 @@ public class EmployeeControllerV2 {
 	/* ******************************************************************************************************** */	
 	@PostMapping
 	public ResponseEntity<Void> save(@Valid @RequestBody NewEmployee newEmployee) {
-		var employeeEntity = new EmployeeEntity()
-				.withName(newEmployee.getName())
-				.withTitle(newEmployee.getTitle());
+		var employeeEntity = new EmployeeEntity();
+		employeeEntity.setName(newEmployee.getName());
+		employeeEntity.setTitle(newEmployee.getTitle());				
 		return ResponseEntity.created(UriComponentsBuilder.fromPath("v2/employees/{id}")
                 	.build(employeeRepository.save(employeeEntity)))
 				.build();
@@ -131,10 +134,10 @@ public class EmployeeControllerV2 {
 	/* ******************************************************************************************************** */
 	@PatchMapping("{id}")
 	public ResponseEntity<Void> updateById(@PathVariable int id, @Valid @RequestBody NewEmployee newEmployee) {
-		var employeeEntity = new EmployeeEntity()
-				.withId(id)
-				.withName(newEmployee.getName())
-				.withTitle(newEmployee.getTitle());
+		var employeeEntity = new EmployeeEntity();
+		employeeEntity.setId(id);
+		employeeEntity.setName(newEmployee.getName());
+		employeeEntity.setTitle(newEmployee.getTitle());				
 		employeeRepository.update(employeeEntity);
 		return ResponseEntity.noContent().build();
 	}

@@ -31,21 +31,6 @@ public class EmployeeEntity {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	public EmployeeEntity withId(int id) {
-		this.id = id;
-		return this;
-	}
-
-	public EmployeeEntity withName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public EmployeeEntity withTitle(String title) {
-		this.title = title;
-		return this;
-	}
 
 	@Override
 	public int hashCode() {
