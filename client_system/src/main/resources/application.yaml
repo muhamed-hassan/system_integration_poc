@@ -1,15 +1,8 @@
 server:
   port: 8081
   
-backendSystem:
-   baseUrlV1: 'http://localhost:8080/v1/'  
+backendSystem:  
    baseUrlV2: 'http://localhost:8080/v2'
-
-webClientConfigs:
-   connectTimeoutMillis: 5000
-   readTimeoutMillis: 5000
-   writeTimeoutMillis: 5000
-   responseTimeoutMillis: 5000
    
 restTemplateConfigs:
    connectTimeoutMillis: 5000

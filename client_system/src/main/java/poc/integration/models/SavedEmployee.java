@@ -31,21 +31,6 @@ public class SavedEmployee {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	public SavedEmployee withId(int id) {
-		this.id = id;
-		return this;
-	}
-
-	public SavedEmployee withName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public SavedEmployee withTitle(String title) {
-		this.title = title;
-		return this;
-	}
 
 	@Override
 	public int hashCode() {

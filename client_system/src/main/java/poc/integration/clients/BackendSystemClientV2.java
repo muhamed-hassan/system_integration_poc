@@ -38,27 +38,37 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	/* ******************************************************************************************************** */	
 	public void save() {		
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		post("/employees", employee);
 	}
 	
 	public void saveWithViolatingPayloadValidations() {
-		var employee = new NewEmployee().withName("").withTitle("");
+		var employee = new NewEmployee();
+		employee.setName("");
+		employee.setTitle("");
 		post("/employees", employee);
 	}
 	
 	public void postWithClientError() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		post(CLIENT_ERROR_REQUEST_PATH, employee);
 	}
 	
 	public void postWithServerError() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		post(SERVER_ERROR_REQUEST_PATH, employee);
 	}
 	
 	public void postWithOtherError() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		post(OTHER_ERROR_REQUEST_PATH, employee);
 	}
 	
@@ -81,27 +91,37 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	/* ******************************************************************************************************** */	
 	public void updateById() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		patch("/employees/91", employee);
 	}
 	
 	public void updateByIdWithViolatingPayloadValidations() {
-		var employee = new NewEmployee().withName("").withTitle("");
+		var employee = new NewEmployee();
+		employee.setName("");
+		employee.setTitle("");
 		patch("/employees/91", employee);
 	}
 	
 	public void patchWithClientError() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		patch(CLIENT_ERROR_REQUEST_PATH, employee);
 	}
 	
 	public void patchWithServerError() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		patch(SERVER_ERROR_REQUEST_PATH, employee);
 	}
 	
 	public void patchWithOtherError() {
-		var employee = new NewEmployee().withName("sample name").withTitle("sample title");
+		var employee = new NewEmployee();
+		employee.setName("sample name");
+		employee.setTitle("sample title");
 		patch(OTHER_ERROR_REQUEST_PATH, employee);
 	}
 

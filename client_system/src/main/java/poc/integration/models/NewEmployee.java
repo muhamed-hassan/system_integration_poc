@@ -21,16 +21,6 @@ public class NewEmployee {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	public NewEmployee withName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public NewEmployee withTitle(String title) {
-		this.title = title;
-		return this;
-	}
 
 	@Override
 	public String toString() {
