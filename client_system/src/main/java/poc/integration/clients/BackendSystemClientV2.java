@@ -17,8 +17,7 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 
 	public SavedEmployee findById() {
 		return getSingle("/employees/1", SavedEmployee.class);	
-	}
-	
+	}	
 	
 	public List<SavedEmployee> findByPage() {
 		return getList("/employees?pageNumber=1&pageSize=10", new ParameterizedTypeReference<List<SavedEmployee>>() {});

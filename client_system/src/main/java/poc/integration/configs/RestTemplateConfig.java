@@ -13,7 +13,6 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.Netty4ClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
@@ -53,7 +52,6 @@ public class RestTemplateConfig {
 							displayer.print(response.getHeaders().entrySet());
 						}						
 						return response;})	
-					.requestFactory(Netty4ClientHttpRequestFactory.class)
 					.build();
 	}
 	
