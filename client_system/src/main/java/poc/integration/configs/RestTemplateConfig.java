@@ -42,7 +42,11 @@ public class RestTemplateConfig {
 					.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 					.setConnectTimeout(Duration.ofMillis(connectTimeoutMillis))
 					.setReadTimeout(Duration.ofMillis(readTimeoutMillis))
+
+					// activate `errorHandler` in local-profile only
 					.errorHandler(new ResponseErrorHandlerImpl())
+					
+					// activate `interceptors` in local-profile only
 					.interceptors((HttpRequest request, byte[] body, ClientHttpRequestExecution execution) -> {
 						displayer.print(">>> " + request.getMethod() + ": HTTP Request is initiated ...");				
 						displayer.print(request.getHeaders().entrySet());
