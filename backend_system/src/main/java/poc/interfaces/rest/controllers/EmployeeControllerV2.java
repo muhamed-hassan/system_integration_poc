@@ -39,17 +39,17 @@ public class EmployeeControllerV2 {
 	@GetMapping("{id}")
 	public ResponseEntity<SavedEmployee> findById(@PathVariable int id) {
 		var employeeEntity = employeeRepository.findById(id);
-		var response = new SavedEmployee();
-		response.setId(id);
-		response.setName(employeeEntity.getName());
-		response.setTitle(employeeEntity.getTitle());
-		return ResponseEntity.ok(response);
+		var responseBody = new SavedEmployee();
+		responseBody.setId(id);
+		responseBody.setName(employeeEntity.getName());
+		responseBody.setTitle(employeeEntity.getTitle());
+		return ResponseEntity.ok(responseBody);
 	}
 	
 	@GetMapping
 	public ResponseEntity<List<SavedEmployee>> findByPage
 			(@RequestParam int pageNumber, @RequestParam int pageSize) {
-		var response = employeeRepository.findByPage(pageNumber, pageSize)
+		var responseBody = employeeRepository.findByPage(pageNumber, pageSize)
 											.stream()
 											.map(employeeEntity -> {
 												var savedEmployee = new SavedEmployee();
@@ -59,7 +59,7 @@ public class EmployeeControllerV2 {
 												return savedEmployee;
 											})
 											.collect(Collectors.toList());		
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(responseBody);
 	}
 	
 	@GetMapping("client_error")
