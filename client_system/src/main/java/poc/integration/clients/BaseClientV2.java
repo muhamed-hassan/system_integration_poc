@@ -1,56 +1,196 @@
 package poc.integration.clients;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-import poc.view.Displayer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+/*
+ * Designed to be extended (inherited) to hide the low level complexity a bit and generalize the HTTP verbs usage.
+ * 
+ * Abstract Example: 
+ * - ChildClientClass extends BaseClientV2 => Where `ChildClient` is replaced with a proper name where it follows SRP and KISS 
+ * 
+ * Real Example: 
+ * - BackendSystemClientV2 extends BaseClientV2
+ * */
 public class BaseClientV2 {
-
-	@Autowired
-	private RestTemplate restTemplate;
 	
-	@Autowired
-	private Displayer displayer;
+	@Value("${backendSystem.baseUrlV2}")
+	private String backendSystemBaseUrl;
 	
-	protected <T> T getSingle(String requestPath, Class<T> responseBodyType) {
-		displayer.print("GET BaseClientV2::getSingle()");		
-		return restTemplate.exchange(requestPath, HttpMethod.GET, HttpEntity.EMPTY, responseBodyType).getBody();
+	protected Object get(String requestPath, Class<? extends Object> responseBodyType) {
+		
+		Object responseBody = null;		
+		try {
+			
+			URL url = new URL(backendSystemBaseUrl + requestPath);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod(RequestMethod.GET.toString());
+			int responseCode = connection.getResponseCode();
+			System.out.println("GET Response Code :: " + responseCode);
+			ObjectMapper objectMapper = new ObjectMapper();
+			switch (responseCode) {
+				case HttpURLConnection.HTTP_OK:					
+					responseBody = objectMapper.readValue((InputStream) connection.getContent(), responseBodyType);
+					System.out.println("> Parsed response: " + responseBody);
+					break;
+				case HttpURLConnection.HTTP_SERVER_ERROR:
+					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
+				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+				default:
+					throw new IOException("Failed to connect with " + url);
+			}			
+			
+		} catch (MalformedURLException e) {
+			System.out.println(e.getMessage());
+		} catch (ProtocolException e) {
+			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		System.out.println("==");
+		return responseBody;
 	}
-	
-	protected <T> List<T> getList(String requestPath, ParameterizedTypeReference<List<T>> responseBodyType) {
-		displayer.print("GET BaseClientV2::getList()");		
-		return restTemplate.exchange(requestPath, HttpMethod.GET, HttpEntity.EMPTY, responseBodyType).getBody();
-	}
-	
-	protected void getWithError(String requestPath) {
-		displayer.print("GET BaseClientV2::getWithError()");		
-		restTemplate.exchange(requestPath, HttpMethod.GET, HttpEntity.EMPTY, Void.class);
-	}
-	
+		
 	/* ******************************************************************************************************** */	
 	protected <T> void post(String requestPath, T payload) {
-		displayer.print("POST BaseClientV2::post()");
-		var httpEntity = new HttpEntity<>(payload);
-		restTemplate.exchange(requestPath, HttpMethod.POST, httpEntity, Void.class);
+		
+		try {
+			
+			URL url = new URL(backendSystemBaseUrl + requestPath);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod(RequestMethod.POST.toString());
+			connection.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			connection.setDoOutput(true);			
+			
+			ObjectMapper objectMapper = new ObjectMapper();			
+			OutputStream outputStream = connection.getOutputStream();			
+			objectMapper.writeValue(outputStream, payload);
+			outputStream.flush();
+			
+			int responseCode = connection.getResponseCode();
+			System.out.println("POST Response Code :: " + responseCode);
+			switch (responseCode) {
+				case HttpURLConnection.HTTP_CREATED:
+					String locationOfCreatedResource = backendSystemBaseUrl + connection.getHeaderField(HttpHeaders.LOCATION);
+					System.out.println("> Payload is sent successfully and can be followed on : " + locationOfCreatedResource);
+					break;
+				case HttpURLConnection.HTTP_BAD_REQUEST:
+					Object errorBodyWithBadRequest = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
+					throw new IOException("Sent payload is not valid: " + errorBodyWithBadRequest);
+				case HttpURLConnection.HTTP_SERVER_ERROR:
+					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
+				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+				default:
+					throw new IOException("Failed to connect with " + url);
+			}
+			
+		} catch (MalformedURLException e) {
+			System.out.println(e.getMessage());
+		} catch (ProtocolException e) {
+			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		System.out.println("==");
 	}
 	
 	/* ******************************************************************************************************** */	
 	protected void delete(String requestPath) {
-		displayer.print("DELETE BaseClientV2::delete()");
-		restTemplate.exchange(requestPath, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+		
+		try {
+			
+			URL url = new URL(backendSystemBaseUrl + requestPath);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod(RequestMethod.DELETE.toString());
+						
+			int responseCode = connection.getResponseCode();
+			System.out.println("DELETE Response Code :: " + responseCode);
+			ObjectMapper objectMapper = new ObjectMapper();
+			switch (responseCode) {
+				case HttpURLConnection.HTTP_NO_CONTENT:
+					System.out.println("> Delete is done");
+					break;
+				case HttpURLConnection.HTTP_SERVER_ERROR:
+					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
+				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+				default:
+					throw new IOException("Failed to connect with " + url);
+			}
+			
+		} catch (MalformedURLException e) {
+			System.out.println(e.getMessage());
+		} catch (ProtocolException e) {
+			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		System.out.println("==");
 	}
 	
 	/* ******************************************************************************************************** */	
-	protected <T> void patch(String requestPath, T payload) {
-		displayer.print("PATCH BaseClientV2::patch()");
-		var httpEntity = new HttpEntity<>(payload);
-		restTemplate.exchange(requestPath, HttpMethod.PATCH, httpEntity, Void.class);
+	protected <T> void put(String requestPath, T payload) {
+		
+		try {
+			
+			URL url = new URL(backendSystemBaseUrl + requestPath);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod(RequestMethod.PUT.toString());
+			connection.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			connection.setDoOutput(true);			
+			
+			ObjectMapper objectMapper = new ObjectMapper();			
+			OutputStream outputStream = connection.getOutputStream();			
+			objectMapper.writeValue(outputStream, payload);
+			outputStream.flush();
+			
+			int responseCode = connection.getResponseCode();
+			System.out.println("PUT Response Code :: " + responseCode);
+			switch (responseCode) {
+				case HttpURLConnection.HTTP_NO_CONTENT:
+					System.out.println("> Payload is sent successfully");
+					break;
+				case HttpURLConnection.HTTP_BAD_REQUEST:
+					Object errorBodyWithBadRequest = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
+					throw new IOException("Sent payload is not valid: " + errorBodyWithBadRequest);
+				case HttpURLConnection.HTTP_SERVER_ERROR:
+					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
+				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+				default:
+					throw new IOException("Failed to connect with " + url);
+			}
+			
+		} catch (MalformedURLException e) {
+			System.out.println(e.getMessage());
+		} catch (ProtocolException e) {
+			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		System.out.println("==");
 	}
 		
 }
