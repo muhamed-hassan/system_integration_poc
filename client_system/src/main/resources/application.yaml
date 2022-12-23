@@ -2,8 +2,4 @@ server:
   port: 8081
   
 backendSystem:  
-   baseUrlV2: 'http://localhost:8080/v2'
-   
-restTemplateConfigs:
-   connectTimeoutMillis: 5000
-   readTimeoutMillis: 5000   
+   baseUrlV2: 'http://localhost:8080/' 

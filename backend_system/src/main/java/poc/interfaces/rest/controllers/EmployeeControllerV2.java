@@ -1,162 +1,176 @@
 package poc.interfaces.rest.controllers;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import poc.persistence.daos.EmployeeRepository;
-import poc.persistence.models.EmployeeEntity;
 import poc.interfaces.rest.models.NewEmployee;
 import poc.interfaces.rest.models.SavedEmployee;
+import poc.persistence.entities.Employee;
+import poc.persistence.repositories.EmployeeRepository;
 
 @RestController
 @RequestMapping("v2/employees")
 @Validated
 public class EmployeeControllerV2 {
 	
-	private final EmployeeRepository employeeRepository;
-
-	public EmployeeControllerV2(EmployeeRepository employeeRepository) {
-		this.employeeRepository = employeeRepository;
-	}
+	@Autowired
+	private EmployeeRepository employeeRepository;
 		
-	@GetMapping("{id}")
+	@RequestMapping(method = RequestMethod.GET, value = "{id}")
 	public ResponseEntity<SavedEmployee> findById(@PathVariable int id) {
-		var employeeEntity = employeeRepository.findById(id);
-		var responseBody = new SavedEmployee();
-		responseBody.setId(id);
-		responseBody.setName(employeeEntity.getName());
-		responseBody.setTitle(employeeEntity.getTitle());
-		return ResponseEntity.ok(responseBody);
+		
+		Employee employeeEntity = employeeRepository.findById(id);
+		
+		SavedEmployee savedEmployee = new SavedEmployee();
+		savedEmployee.setId(id);
+		savedEmployee.setName(employeeEntity.getName());
+		savedEmployee.setTitle(employeeEntity.getTitle());		
+		
+		return new ResponseEntity<SavedEmployee>(savedEmployee, HttpStatus.OK);
 	}
 	
-	@GetMapping
-	public ResponseEntity<List<SavedEmployee>> findByPage
-			(@RequestParam int pageNumber, @RequestParam int pageSize) {
-		var responseBody = employeeRepository.findByPage(pageNumber, pageSize)
-											.stream()
-											.map(employeeEntity -> {
-												var savedEmployee = new SavedEmployee();
-												savedEmployee.setId(employeeEntity.getId());
-												savedEmployee.setName(employeeEntity.getName());
-												savedEmployee.setTitle(employeeEntity.getTitle());
-												return savedEmployee;
-											})
-											.collect(Collectors.toList());		
-		return ResponseEntity.ok(responseBody);
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<List<SavedEmployee>> findByPage(@RequestParam int pageNumber, @RequestParam int pageSize) {
+		
+		TreeSet<Employee> employees = employeeRepository.findByPage(pageNumber, pageSize);
+		
+		List<SavedEmployee> collectedElements = new ArrayList<SavedEmployee>();
+		Iterator<Employee> iterator = employees.iterator();		
+		while (iterator.hasNext()) {
+			
+			Employee currentElement = iterator.next();
+			
+			SavedEmployee savedEmployee = new SavedEmployee();
+			savedEmployee.setId(currentElement.getId());
+			savedEmployee.setName(currentElement.getName());
+			savedEmployee.setTitle(currentElement.getTitle());
+			
+			collectedElements.add(savedEmployee);
+		}		
+		
+		return new ResponseEntity<List<SavedEmployee>>(collectedElements, HttpStatus.OK);
 	}
 	
-	@GetMapping("client_error")
-	public ResponseEntity<Void> doClientErrorWithGET() {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	@RequestMapping(method = RequestMethod.GET, value = "server_error")
+	public ResponseEntity<Object> doServerErrorWithGET() {
+		
+		// RestErrorHandler::handleGeneralException() shall take care of generating the response
+		if (true) throw new RuntimeException("forced exception => doServerErrorWithGET()");
+		
+		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@GetMapping("server_error")
-	public ResponseEntity<Void> doServerErrorWithGET() {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	}
-	
-	@GetMapping("other_error")
-	public ResponseEntity<Void> doOtherErrorWithGET() 
-			throws InterruptedException {
+	@RequestMapping(method = RequestMethod.GET, value = "other_error")
+	public ResponseEntity<Object> doOtherErrorWithGET() throws InterruptedException {
+		
 		TimeUnit.SECONDS.sleep(10);
-		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
 	}
 	
 	/* ******************************************************************************************************** */	
-	@PostMapping
-	public ResponseEntity<Void> save(@Valid @RequestBody NewEmployee newEmployee) {
-		var employeeEntity = new EmployeeEntity();
+	@RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity<Object> save(@Valid @RequestBody NewEmployee newEmployee) {
+		
+		Employee employeeEntity = new Employee();
 		employeeEntity.setName(newEmployee.getName());
-		employeeEntity.setTitle(newEmployee.getTitle());				
-		return ResponseEntity.created(UriComponentsBuilder.fromPath("v2/employees/{id}")
-                	.build(employeeRepository.save(employeeEntity)))
-				.build();
+		employeeEntity.setTitle(newEmployee.getTitle());	
+		
+		int idOfSavedEmployee = employeeRepository.save(employeeEntity);
+    	URI uriOfCreatedEmployee = UriComponentsBuilder.fromPath("v2/employees/{id}").build(idOfSavedEmployee);
+		MultiValueMap<String, String> httpHeaders = new HttpHeaders();    	
+		httpHeaders.add(HttpHeaders.LOCATION, uriOfCreatedEmployee.toString());
+    	
+		return new ResponseEntity<Object>(httpHeaders, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("client_error")
-	public ResponseEntity<Void> doClientErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	@RequestMapping(method = RequestMethod.POST, value = "server_error")
+	public ResponseEntity<Object> doServerErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
+		
+		// RestErrorHandler::handleGeneralException() shall take care of generating the response
+		if (true) throw new RuntimeException("forced exception => doServerErrorWithPOST()");
+				
+		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@PostMapping("server_error")
-	public ResponseEntity<Void> doServerErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	}
-	
-	@PostMapping("other_error")
-	public ResponseEntity<Void> doOtherErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) 
-			throws InterruptedException {
+	@RequestMapping(method = RequestMethod.POST, value = "other_error")
+	public ResponseEntity<Object> doOtherErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) throws InterruptedException {
+		
 		TimeUnit.SECONDS.sleep(10);
-		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
 	}
 	
 	/* ******************************************************************************************************** */
-	@DeleteMapping("{id}")
-	public ResponseEntity<Void> deleteById(@PathVariable int id) {
+	@RequestMapping(method = RequestMethod.DELETE, value = "{id}")
+	public ResponseEntity<Object> deleteById(@PathVariable int id) {
+		
 		employeeRepository.delete(id);
-		return ResponseEntity.noContent().build();
+		return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
 	}
 	
-	@DeleteMapping("client_error")
-	public ResponseEntity<Void> doClientErrorWithDELETE() {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	@RequestMapping(method = RequestMethod.DELETE, value = "server_error")
+	public ResponseEntity<Object> doServerErrorWithDELETE() {
+		
+		// RestErrorHandler::handleGeneralException() shall take care of generating the response
+		if (true) throw new RuntimeException("forced exception => doServerErrorWithDELETE()");
+				
+		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@DeleteMapping("server_error")
-	public ResponseEntity<Void> doServerErrorWithDELETE() {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	}
-	
-	@DeleteMapping("other_error")
-	public ResponseEntity<Void> doOtherErrorWithDELETE() 
-			throws InterruptedException {
+	@RequestMapping(method = RequestMethod.DELETE, value = "other_error")
+	public ResponseEntity<Object> doOtherErrorWithDELETE() throws InterruptedException {
+		
 		TimeUnit.SECONDS.sleep(10);
-		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
 	}
 	
 	/* ******************************************************************************************************** */
-	@PatchMapping("{id}")
-	public ResponseEntity<Void> updateById(@PathVariable int id, @Valid @RequestBody NewEmployee newEmployee) {
-		var employeeEntity = new EmployeeEntity();
+	@RequestMapping(method = RequestMethod.PUT, value = "{id}")
+	public ResponseEntity<Object> updateById(@PathVariable int id, @Valid @RequestBody NewEmployee newEmployee) {
+		
+		Employee employeeEntity = new Employee();
 		employeeEntity.setId(id);
 		employeeEntity.setName(newEmployee.getName());
-		employeeEntity.setTitle(newEmployee.getTitle());				
+		employeeEntity.setTitle(newEmployee.getTitle());
+		
 		employeeRepository.update(employeeEntity);
-		return ResponseEntity.noContent().build();
+		
+		return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
 	}
 	
-	@PatchMapping("client_error")
-	public ResponseEntity<Void> doClientErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	@RequestMapping(method = RequestMethod.PUT, value = "server_error")
+	public ResponseEntity<Object> doServerErrorWithPUT(@Valid @RequestBody NewEmployee newEmployee) {
+		
+		// RestErrorHandler::handleGeneralException() shall take care of generating the response
+		if (true) throw new RuntimeException("forced exception => doServerErrorWithPUT()");
+				
+		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@PatchMapping("server_error")
-	public ResponseEntity<Void> doServerErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	}
-	
-	@PatchMapping("other_error")
-	public ResponseEntity<Void> doOtherErrorWithPATCH(@Valid @RequestBody NewEmployee newEmployee) 
-			throws InterruptedException {
+	@RequestMapping(method = RequestMethod.PUT, value = "other_error")
+	public ResponseEntity<Object> doOtherErrorWithPUT(@Valid @RequestBody NewEmployee newEmployee) throws InterruptedException {
+		
 		TimeUnit.SECONDS.sleep(10);
-		return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
 	}
 
 }

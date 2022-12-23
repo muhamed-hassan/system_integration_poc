@@ -2,7 +2,6 @@ package poc.integration.clients;
 
 import java.util.List;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import poc.integration.models.NewEmployee;
@@ -11,61 +10,49 @@ import poc.integration.models.SavedEmployee;
 @Component
 public class BackendSystemClientV2 extends BaseClientV2 {
 	
-	private static final String CLIENT_ERROR_REQUEST_PATH = "/employees/client_error";
-	private static final String SERVER_ERROR_REQUEST_PATH = "/employees/server_error";
-	private static final String OTHER_ERROR_REQUEST_PATH = "/employees/other_error";
-
+	private static final String SERVER_ERROR_REQUEST_PATH = "v2/employees/server_error";
+	private static final String OTHER_ERROR_REQUEST_PATH = "v2/employees/other_error";
+	
 	public SavedEmployee findById() {
-		return getSingle("/employees/1", SavedEmployee.class);	
+		return (SavedEmployee) get("v2/employees/1", SavedEmployee.class);
 	}	
 	
 	public List<SavedEmployee> findByPage() {
-		return getList("/employees?pageNumber=1&pageSize=10", new ParameterizedTypeReference<List<SavedEmployee>>() {});
-	}
-	
-	public void getWithClientError() {
-		getWithError(CLIENT_ERROR_REQUEST_PATH);
+		return (List<SavedEmployee>) get("v2/employees?pageNumber=1&pageSize=10", List.class);
 	}
 	
 	public void getWithServerError() {
-		getWithError(SERVER_ERROR_REQUEST_PATH);
+		get(SERVER_ERROR_REQUEST_PATH, Object.class);
 	}
 	
 	public void getWithOtherError() {
-		getWithError(OTHER_ERROR_REQUEST_PATH);
+		get(OTHER_ERROR_REQUEST_PATH, Object.class);
 	}
 	
 	/* ******************************************************************************************************** */	
 	public void save() {		
-		var employee = new NewEmployee();
+		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
-		post("/employees", employee);
+		post("v2/employees", employee);
 	}
 	
 	public void saveWithViolatingPayloadValidations() {
-		var employee = new NewEmployee();
+		NewEmployee employee = new NewEmployee();
 		employee.setName("");
 		employee.setTitle("");
-		post("/employees", employee);
-	}
-	
-	public void postWithClientError() {
-		var employee = new NewEmployee();
-		employee.setName("sample name");
-		employee.setTitle("sample title");
-		post(CLIENT_ERROR_REQUEST_PATH, employee);
+		post("v2/employees", employee);
 	}
 	
 	public void postWithServerError() {
-		var employee = new NewEmployee();
+		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
 		post(SERVER_ERROR_REQUEST_PATH, employee);
 	}
 	
 	public void postWithOtherError() {
-		var employee = new NewEmployee();
+		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
 		post(OTHER_ERROR_REQUEST_PATH, employee);
@@ -73,11 +60,7 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	/* ******************************************************************************************************** */	
 	public void deleteById() {
-		delete("/employees/51");
-	}
-	
-	public void deleteWithClientError() {
-		delete(CLIENT_ERROR_REQUEST_PATH);
+		delete("v2/employees/51");
 	}
 	
 	public void deleteWithServerError() {
@@ -90,38 +73,31 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	/* ******************************************************************************************************** */	
 	public void updateById() {
-		var employee = new NewEmployee();
+		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
-		patch("/employees/91", employee);
+		put("v2/employees/91", employee);
 	}
 	
 	public void updateByIdWithViolatingPayloadValidations() {
-		var employee = new NewEmployee();
+		NewEmployee employee = new NewEmployee();
 		employee.setName("");
 		employee.setTitle("");
-		patch("/employees/91", employee);
+		put("v2/employees/91", employee);
 	}
 	
-	public void patchWithClientError() {
-		var employee = new NewEmployee();
+	public void putWithServerError() {
+		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
-		patch(CLIENT_ERROR_REQUEST_PATH, employee);
+		put(SERVER_ERROR_REQUEST_PATH, employee);
 	}
 	
-	public void patchWithServerError() {
-		var employee = new NewEmployee();
+	public void putWithOtherError() {
+		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
-		patch(SERVER_ERROR_REQUEST_PATH, employee);
-	}
-	
-	public void patchWithOtherError() {
-		var employee = new NewEmployee();
-		employee.setName("sample name");
-		employee.setTitle("sample title");
-		patch(OTHER_ERROR_REQUEST_PATH, employee);
+		put(OTHER_ERROR_REQUEST_PATH, employee);
 	}
 
 }

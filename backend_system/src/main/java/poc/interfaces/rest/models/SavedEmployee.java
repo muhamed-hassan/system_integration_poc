@@ -41,22 +41,17 @@ public class SavedEmployee {
 	}
 
 	@Override
-	public boolean equals(Object that) {
-		if (this == that)
+	public boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		if (that == null)
+		if (obj == null)
 			return false;
-		if (getClass() != that.getClass())
+		if (getClass() != obj.getClass())
 			return false;
-		SavedEmployee other = (SavedEmployee) that;
+		SavedEmployee other = (SavedEmployee) obj;
 		if (id != other.id)
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "SavedEmployee [id=" + id + ", name=" + name + ", title=" + title + "]";
 	}
 	
 }

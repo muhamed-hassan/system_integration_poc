@@ -26,9 +26,4 @@ public class NewEmployee {
 		this.title = title;
 	}
 
-	@Override
-	public String toString() {
-		return "NewEmployee [name=" + name + ", title=" + title + "]";
-	}
-
 }

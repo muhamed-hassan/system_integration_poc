@@ -1,6 +1,6 @@
-package poc.persistence.models;
+package poc.persistence.entities;
 
-public class EmployeeEntity {
+public class Employee implements Comparable<Employee> {
 
 	private int id;
 
@@ -41,22 +41,22 @@ public class EmployeeEntity {
 	}
 
 	@Override
-	public boolean equals(Object that) {
-		if (this == that)
+	public boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		if (that == null)
+		if (obj == null)
 			return false;
-		if (getClass() != that.getClass())
+		if (getClass() != obj.getClass())
 			return false;
-		EmployeeEntity other = (EmployeeEntity) that;
+		Employee other = (Employee) obj;
 		if (id != other.id)
 			return false;
 		return true;
 	}
 
 	@Override
-	public String toString() {
-		return "EmployeeEntity [id=" + id + ", name=" + name + ", title=" + title + "]";
+	public int compareTo(Employee other) {
+		return getId() - other.getId();
 	}
-
+	
 }

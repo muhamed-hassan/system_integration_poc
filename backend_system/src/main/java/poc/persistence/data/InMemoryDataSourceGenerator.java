@@ -1,36 +1,39 @@
 package poc.persistence.data;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
 
-import poc.persistence.models.EmployeeEntity;
+import poc.persistence.entities.Employee;
 
 @Component
-public class MockedDataSource {
+public class InMemoryDataSourceGenerator {
 	
-	private List<EmployeeEntity> employees;
+	private TreeSet<Employee> employees;
 	
 	@PostConstruct
 	public void initDataSource() {
+		
 		System.out.println();
-		System.out.println("initDataSource is starting ...");		
-		employees = new ArrayList<>();
+		System.out.println("initDataSource is starting ...");	
+		
+		employees = new TreeSet<Employee>();
 		for (int cursor = 1; cursor <= 100; cursor++) {
-			var employee = new EmployeeEntity();
+			
+			Employee employee = new Employee();
 			employee.setId(cursor);
 			employee.setName("name _ " + cursor);
 			employee.setTitle("title _ " + cursor);		
 			employees.add(employee);
 		}		
+		
 		System.out.println("100 elements get allocated 👍");
 		System.out.println();
 	}
 
-	public List<EmployeeEntity> getEmployees() {
+	public TreeSet<Employee> getEmployees() {
 		return employees;
 	}
 	
