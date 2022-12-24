@@ -2,12 +2,9 @@ package poc.integration.clients;
 
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
 import poc.integration.models.NewEmployee;
 import poc.integration.models.SavedEmployee;
 
-@Component
 public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	private static final String SERVER_ERROR_REQUEST_PATH = "v2/employees/server_error";

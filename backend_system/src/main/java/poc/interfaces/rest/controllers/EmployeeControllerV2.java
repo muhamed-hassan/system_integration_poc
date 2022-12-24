@@ -2,12 +2,12 @@ package poc.interfaces.rest.controllers;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import poc.interfaces.rest.models.NewEmployee;
 import poc.interfaces.rest.models.SavedEmployee;
@@ -72,12 +72,12 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "server_error")
-	public ResponseEntity<Object> doServerErrorWithGET() {
+	public ResponseEntity<Map<String, String>> doServerErrorWithGET() {
 		
-		// RestErrorHandler::handleGeneralException() shall take care of generating the response
-		if (true) throw new RuntimeException("forced exception => doServerErrorWithGET()");
+		Map<String, String> error = new HashMap<String, String>(1);
+		error.put("error", "forced exception => doServerErrorWithGET()");
 		
-		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "other_error")
@@ -89,31 +89,54 @@ public class EmployeeControllerV2 {
 	
 	/* ******************************************************************************************************** */	
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Object> save(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Object> save(@RequestBody NewEmployee newEmployee) {
+		
+		String errorMessage = validate(newEmployee);
+		if (errorMessage != null) {			
+			Map<String, String> error = new HashMap<String, String>(1);
+			error.put("error", errorMessage);			
+			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+		}
 		
 		Employee employeeEntity = new Employee();
 		employeeEntity.setName(newEmployee.getName());
 		employeeEntity.setTitle(newEmployee.getTitle());	
 		
 		int idOfSavedEmployee = employeeRepository.save(employeeEntity);
-    	URI uriOfCreatedEmployee = UriComponentsBuilder.fromPath("v2/employees/{id}").build(idOfSavedEmployee);
+		URI uriOfCreatedEmployee = ServletUriComponentsBuilder.fromCurrentRequest()
+    	        												.path("/v2/employees/{id}")
+    	        												.buildAndExpand(idOfSavedEmployee).toUri();
 		MultiValueMap<String, String> httpHeaders = new HttpHeaders();    	
-		httpHeaders.add(HttpHeaders.LOCATION, uriOfCreatedEmployee.toString());
+		httpHeaders.add("Location", uriOfCreatedEmployee.toString());
     	
 		return new ResponseEntity<Object>(httpHeaders, HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "server_error")
-	public ResponseEntity<Object> doServerErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Map<String, String>> doServerErrorWithPOST(@RequestBody NewEmployee newEmployee) {
 		
-		// RestErrorHandler::handleGeneralException() shall take care of generating the response
-		if (true) throw new RuntimeException("forced exception => doServerErrorWithPOST()");
-				
-		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+		String errorMessage = validate(newEmployee);
+		if (errorMessage != null) {			
+			Map<String, String> error = new HashMap<String, String>(1);
+			error.put("error", errorMessage);			
+			return new ResponseEntity<Map<String, String>>(error, HttpStatus.BAD_REQUEST);
+		}
+		
+		Map<String, String> error = new HashMap<String, String>(1);
+		error.put("error", "forced exception => doServerErrorWithPOST()");
+		
+		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "other_error")
-	public ResponseEntity<Object> doOtherErrorWithPOST(@Valid @RequestBody NewEmployee newEmployee) throws InterruptedException {
+	public ResponseEntity<Object> doOtherErrorWithPOST(@RequestBody NewEmployee newEmployee) throws InterruptedException {
+		
+		String errorMessage = validate(newEmployee);
+		if (errorMessage != null) {			
+			Map<String, String> error = new HashMap<String, String>(1);
+			error.put("error", errorMessage);			
+			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+		}
 		
 		TimeUnit.SECONDS.sleep(10);
 		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
@@ -128,12 +151,12 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "server_error")
-	public ResponseEntity<Object> doServerErrorWithDELETE() {
+	public ResponseEntity<Map<String, String>> doServerErrorWithDELETE() {
 		
-		// RestErrorHandler::handleGeneralException() shall take care of generating the response
-		if (true) throw new RuntimeException("forced exception => doServerErrorWithDELETE()");
-				
-		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+		Map<String, String> error = new HashMap<String, String>(1);
+		error.put("error", "forced exception => doServerErrorWithDELETE()");
+		
+		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "other_error")
@@ -145,7 +168,14 @@ public class EmployeeControllerV2 {
 	
 	/* ******************************************************************************************************** */
 	@RequestMapping(method = RequestMethod.PUT, value = "{id}")
-	public ResponseEntity<Object> updateById(@PathVariable int id, @Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Object> updateById(@PathVariable int id, @RequestBody NewEmployee newEmployee) {
+		
+		String errorMessage = validate(newEmployee);
+		if (errorMessage != null) {			
+			Map<String, String> error = new HashMap<String, String>(1);
+			error.put("error", errorMessage);			
+			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+		}
 		
 		Employee employeeEntity = new Employee();
 		employeeEntity.setId(id);
@@ -158,19 +188,59 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "server_error")
-	public ResponseEntity<Object> doServerErrorWithPUT(@Valid @RequestBody NewEmployee newEmployee) {
+	public ResponseEntity<Map<String, String>> doServerErrorWithPUT(@RequestBody NewEmployee newEmployee) {
 		
-		// RestErrorHandler::handleGeneralException() shall take care of generating the response
-		if (true) throw new RuntimeException("forced exception => doServerErrorWithPUT()");
-				
-		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+		String errorMessage = validate(newEmployee);
+		if (errorMessage != null) {			
+			Map<String, String> error = new HashMap<String, String>(1);
+			error.put("error", errorMessage);			
+			return new ResponseEntity<Map<String, String>>(error, HttpStatus.BAD_REQUEST);
+		}
+		
+		Map<String, String> error = new HashMap<String, String>(1);
+		error.put("error", "forced exception => doServerErrorWithPUT()");
+		
+		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "other_error")
-	public ResponseEntity<Object> doOtherErrorWithPUT(@Valid @RequestBody NewEmployee newEmployee) throws InterruptedException {
+	public ResponseEntity<Object> doOtherErrorWithPUT(@RequestBody NewEmployee newEmployee) throws InterruptedException {
+		
+		String errorMessage = validate(newEmployee);
+		if (errorMessage != null) {			
+			Map<String, String> error = new HashMap<String, String>(1);
+			error.put("error", errorMessage);			
+			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+		}
 		
 		TimeUnit.SECONDS.sleep(10);
 		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
+	}
+	
+	/* ******************************************************************************************************** */
+	/* ******************************************************************************************************** */
+	
+	private String validate(NewEmployee newEmployee) {
+	
+		String name = newEmployee.getName();
+		if (name == null) {
+			return "name is required";
+		}
+		name = name.trim();
+		if (name.length() == 0) {
+			return "name is required";
+		}		
+		
+		String title = newEmployee.getTitle();
+		if (title == null) {
+			return "title is required";
+		}
+		title = title.trim();
+		if (title.length() == 0) {
+			return "title is required";
+		}
+		
+		return null;
 	}
 
 }

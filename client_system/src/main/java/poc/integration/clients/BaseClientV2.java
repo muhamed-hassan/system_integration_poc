@@ -8,11 +8,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /*
@@ -26,8 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * */
 public class BaseClientV2 {
 	
-	@Value("${backendSystem.baseUrlV2}")
-	private String backendSystemBaseUrl;
+	private String backendSystemBaseUrl = "http://localhost:8080/";
 	
 	protected Object get(String requestPath, Class<? extends Object> responseBodyType) {
 		
@@ -36,7 +30,7 @@ public class BaseClientV2 {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(RequestMethod.GET.toString());
+			connection.setRequestMethod("GET");
 			int responseCode = connection.getResponseCode();
 			System.out.println("GET Response Code :: " + responseCode);
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -73,8 +67,8 @@ public class BaseClientV2 {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(RequestMethod.POST.toString());
-			connection.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);			
 			
 			ObjectMapper objectMapper = new ObjectMapper();			
@@ -86,7 +80,7 @@ public class BaseClientV2 {
 			System.out.println("POST Response Code :: " + responseCode);
 			switch (responseCode) {
 				case HttpURLConnection.HTTP_CREATED:
-					String locationOfCreatedResource = backendSystemBaseUrl + connection.getHeaderField(HttpHeaders.LOCATION);
+					String locationOfCreatedResource = backendSystemBaseUrl + connection.getHeaderField("Location");
 					System.out.println("> Payload is sent successfully and can be followed on : " + locationOfCreatedResource);
 					break;
 				case HttpURLConnection.HTTP_BAD_REQUEST:
@@ -119,7 +113,7 @@ public class BaseClientV2 {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(RequestMethod.DELETE.toString());
+			connection.setRequestMethod("DELETE");
 						
 			int responseCode = connection.getResponseCode();
 			System.out.println("DELETE Response Code :: " + responseCode);
@@ -155,8 +149,8 @@ public class BaseClientV2 {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(RequestMethod.PUT.toString());
-			connection.setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			connection.setRequestMethod("PUT");
+			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);			
 			
 			ObjectMapper objectMapper = new ObjectMapper();			
