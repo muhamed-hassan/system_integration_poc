@@ -1,17 +1,34 @@
 package poc;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import poc.integration.clients.BackendSystemClientV2;
 
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan
 public class Launcher {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Launcher.class, args);
+		
+		BackendSystemClientV2 backendSystemClientV2 = new BackendSystemClientV2();
+		
+		backendSystemClientV2.findById();
+		backendSystemClientV2.findByPage();
+		backendSystemClientV2.getWithServerError();
+		backendSystemClientV2.getWithOtherError();		
+
+		System.out.println("*************************************************************");
+		backendSystemClientV2.save();
+		backendSystemClientV2.saveWithViolatingPayloadValidations();
+		backendSystemClientV2.postWithServerError();
+		backendSystemClientV2.postWithOtherError();
+		
+		System.out.println("*************************************************************");
+		backendSystemClientV2.deleteById();
+		backendSystemClientV2.deleteWithServerError();
+		backendSystemClientV2.deleteWithOtherError();
+
+		System.out.println("*************************************************************");
+		backendSystemClientV2.updateById();
+		backendSystemClientV2.updateByIdWithViolatingPayloadValidations();
+		backendSystemClientV2.putWithServerError();
+		backendSystemClientV2.putWithOtherError();	
 	}
 
 }
