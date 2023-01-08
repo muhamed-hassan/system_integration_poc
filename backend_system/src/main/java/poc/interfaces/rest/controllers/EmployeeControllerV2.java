@@ -1,6 +1,5 @@
 package poc.interfaces.rest.controllers;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,17 +9,14 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import poc.interfaces.rest.models.NewEmployee;
 import poc.interfaces.rest.models.SavedEmployee;
@@ -100,14 +96,9 @@ public class EmployeeControllerV2 {
 		employeeEntity.setName(newEmployee.getName());
 		employeeEntity.setTitle(newEmployee.getTitle());	
 		
-		int idOfSavedEmployee = employeeRepository.save(employeeEntity);
-		URI uriOfCreatedEmployee = ServletUriComponentsBuilder.fromCurrentRequest()
-    	        												.path("/v2/employees/{id}")
-    	        												.buildAndExpand(idOfSavedEmployee).toUri();
-		MultiValueMap<String, String> httpHeaders = new HttpHeaders();    	
-		httpHeaders.add("Location", uriOfCreatedEmployee.toString());
+		employeeRepository.save(employeeEntity);		
     	
-		return new ResponseEntity<Object>(httpHeaders, HttpStatus.CREATED);
+		return new ResponseEntity<Object>(HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "server_error")
