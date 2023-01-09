@@ -8,7 +8,6 @@ import poc.integration.models.SavedEmployee;
 public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	private static final String SERVER_ERROR_REQUEST_PATH = "v2/employees/server_error";
-	private static final String OTHER_ERROR_REQUEST_PATH = "v2/employees/other_error";
 	
 	public SavedEmployee findById() {
 		return (SavedEmployee) get("v2/employees/1", SavedEmployee.class);
@@ -22,10 +21,6 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 		get(SERVER_ERROR_REQUEST_PATH, Object.class);
 	}
 	
-	public void getWithOtherError() {
-		get(OTHER_ERROR_REQUEST_PATH, Object.class);
-	}
-	
 	/* ******************************************************************************************************** */	
 	public void save() {		
 		NewEmployee employee = new NewEmployee();
@@ -37,7 +32,7 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	public void saveWithViolatingPayloadValidations() {
 		NewEmployee employee = new NewEmployee();
 		employee.setName("");
-		employee.setTitle("");
+		employee.setTitle("sample title");
 		post("v2/employees", employee);
 	}
 	
@@ -48,13 +43,6 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 		post(SERVER_ERROR_REQUEST_PATH, employee);
 	}
 	
-	public void postWithOtherError() {
-		NewEmployee employee = new NewEmployee();
-		employee.setName("sample name");
-		employee.setTitle("sample title");
-		post(OTHER_ERROR_REQUEST_PATH, employee);
-	}
-	
 	/* ******************************************************************************************************** */	
 	public void deleteById() {
 		delete("v2/employees/51");
@@ -62,10 +50,6 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	
 	public void deleteWithServerError() {
 		delete(SERVER_ERROR_REQUEST_PATH);
-	}
-	
-	public void deleteWithOtherError() {
-		delete(OTHER_ERROR_REQUEST_PATH);
 	}
 	
 	/* ******************************************************************************************************** */	
@@ -79,7 +63,7 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 	public void updateByIdWithViolatingPayloadValidations() {
 		NewEmployee employee = new NewEmployee();
 		employee.setName("");
-		employee.setTitle("");
+		employee.setTitle("sample title");
 		put("v2/employees/91", employee);
 	}
 	
@@ -88,13 +72,6 @@ public class BackendSystemClientV2 extends BaseClientV2 {
 		employee.setName("sample name");
 		employee.setTitle("sample title");
 		put(SERVER_ERROR_REQUEST_PATH, employee);
-	}
-	
-	public void putWithOtherError() {
-		NewEmployee employee = new NewEmployee();
-		employee.setName("sample name");
-		employee.setTitle("sample title");
-		put(OTHER_ERROR_REQUEST_PATH, employee);
 	}
 
 }

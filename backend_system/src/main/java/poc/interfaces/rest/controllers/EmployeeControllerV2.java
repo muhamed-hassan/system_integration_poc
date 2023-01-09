@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,19 +65,11 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "server_error")
-	public ResponseEntity<Map<String, String>> doServerErrorWithGET() {
+	public void doServerErrorWithGET() {
 		
-		Map<String, String> error = new HashMap<String, String>(1);
-		error.put("error", "forced exception => doServerErrorWithGET()");
-		
-		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(method = RequestMethod.GET, value = "other_error")
-	public ResponseEntity<Object> doOtherErrorWithGET() throws InterruptedException {
-		
-		TimeUnit.SECONDS.sleep(10);
-		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
+		if (true) {
+			throw new RuntimeException("forced exception => doServerErrorWithGET()");
+		}
 	}
 	
 	/* ******************************************************************************************************** */	
@@ -102,33 +93,11 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "server_error")
-	public ResponseEntity<Map<String, String>> doServerErrorWithPOST(@RequestBody NewEmployee newEmployee) {
+	public void doServerErrorWithPOST(@RequestBody NewEmployee newEmployee) {
 		
-		String errorMessage = validate(newEmployee);
-		if (errorMessage != null) {			
-			Map<String, String> error = new HashMap<String, String>(1);
-			error.put("error", errorMessage);			
-			return new ResponseEntity<Map<String, String>>(error, HttpStatus.BAD_REQUEST);
+		if (true) {
+			throw new RuntimeException("forced exception => doServerErrorWithPOST()");
 		}
-		
-		Map<String, String> error = new HashMap<String, String>(1);
-		error.put("error", "forced exception => doServerErrorWithPOST()");
-		
-		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(method = RequestMethod.POST, value = "other_error")
-	public ResponseEntity<Object> doOtherErrorWithPOST(@RequestBody NewEmployee newEmployee) throws InterruptedException {
-		
-		String errorMessage = validate(newEmployee);
-		if (errorMessage != null) {			
-			Map<String, String> error = new HashMap<String, String>(1);
-			error.put("error", errorMessage);			
-			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
-		}
-		
-		TimeUnit.SECONDS.sleep(10);
-		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
 	}
 	
 	/* ******************************************************************************************************** */
@@ -140,19 +109,11 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "server_error")
-	public ResponseEntity<Map<String, String>> doServerErrorWithDELETE() {
-		
-		Map<String, String> error = new HashMap<String, String>(1);
-		error.put("error", "forced exception => doServerErrorWithDELETE()");
-		
-		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(method = RequestMethod.DELETE, value = "other_error")
-	public ResponseEntity<Object> doOtherErrorWithDELETE() throws InterruptedException {
-		
-		TimeUnit.SECONDS.sleep(10);
-		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
+	public void doServerErrorWithDELETE() {
+				
+		if (true) {
+			throw new RuntimeException("forced exception => doServerErrorWithDELETE()");
+		}
 	}
 	
 	/* ******************************************************************************************************** */
@@ -177,37 +138,16 @@ public class EmployeeControllerV2 {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "server_error")
-	public ResponseEntity<Map<String, String>> doServerErrorWithPUT(@RequestBody NewEmployee newEmployee) {
-		
-		String errorMessage = validate(newEmployee);
-		if (errorMessage != null) {			
-			Map<String, String> error = new HashMap<String, String>(1);
-			error.put("error", errorMessage);			
-			return new ResponseEntity<Map<String, String>>(error, HttpStatus.BAD_REQUEST);
+	public void doServerErrorWithPUT(@RequestBody NewEmployee newEmployee) {
+						
+		if (true) {
+			throw new RuntimeException("forced exception => doServerErrorWithPUT()");
 		}
-		
-		Map<String, String> error = new HashMap<String, String>(1);
-		error.put("error", "forced exception => doServerErrorWithPUT()");
-		
-		return new ResponseEntity<Map<String, String>>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(method = RequestMethod.PUT, value = "other_error")
-	public ResponseEntity<Object> doOtherErrorWithPUT(@RequestBody NewEmployee newEmployee) throws InterruptedException {
-		
-		String errorMessage = validate(newEmployee);
-		if (errorMessage != null) {			
-			Map<String, String> error = new HashMap<String, String>(1);
-			error.put("error", errorMessage);			
-			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
-		}
-		
-		TimeUnit.SECONDS.sleep(10);
-		return new ResponseEntity<Object>(HttpStatus.REQUEST_TIMEOUT);
 	}
 	
 	/* ******************************************************************************************************** */
 	/* ******************************************************************************************************** */
+	// https://en.wikipedia.org/wiki/Fail-fast approach is used to report validation errors
 	
 	private String validate(NewEmployee newEmployee) {
 	

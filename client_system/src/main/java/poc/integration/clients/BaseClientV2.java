@@ -31,19 +31,18 @@ public class BaseClientV2 {
 			URL url = new URL(backendSystemBaseUrl + requestPath);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Accept", "application/json");
 			int responseCode = connection.getResponseCode();
-			System.out.println("GET Response Code :: " + responseCode);
+			System.out.println("> GET Response Code :: " + responseCode);
 			ObjectMapper objectMapper = new ObjectMapper();
 			switch (responseCode) {
 				case HttpURLConnection.HTTP_OK:					
 					responseBody = objectMapper.readValue((InputStream) connection.getContent(), responseBodyType);
-					System.out.println("> Parsed response: " + responseBody);
+					System.out.println("Parsed response: " + responseBody);
 					break;
-				case HttpURLConnection.HTTP_SERVER_ERROR:
+				case HttpURLConnection.HTTP_INTERNAL_ERROR:
 					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
-					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
-				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);	
 				default:
 					throw new IOException("Failed to connect with " + url);
 			}			
@@ -56,7 +55,7 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		}
 		
-		System.out.println("==");
+		System.out.println();
 		return responseBody;
 	}
 		
@@ -77,20 +76,17 @@ public class BaseClientV2 {
 			outputStream.flush();
 			
 			int responseCode = connection.getResponseCode();
-			System.out.println("POST Response Code :: " + responseCode);
+			System.out.println("> POST Response Code :: " + responseCode);
 			switch (responseCode) {
 				case HttpURLConnection.HTTP_CREATED:
-					String locationOfCreatedResource = backendSystemBaseUrl + connection.getHeaderField("Location");
-					System.out.println("> Payload is sent successfully and can be followed on : " + locationOfCreatedResource);
+					System.out.println("Payload is sent successfully");
 					break;
 				case HttpURLConnection.HTTP_BAD_REQUEST:
 					Object errorBodyWithBadRequest = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
 					throw new IOException("Sent payload is not valid: " + errorBodyWithBadRequest);
-				case HttpURLConnection.HTTP_SERVER_ERROR:
+				case HttpURLConnection.HTTP_INTERNAL_ERROR:
 					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
-					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
-				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);	
 				default:
 					throw new IOException("Failed to connect with " + url);
 			}
@@ -103,7 +99,7 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		}
 		
-		System.out.println("==");
+		System.out.println();
 	}
 	
 	/* ******************************************************************************************************** */	
@@ -116,17 +112,15 @@ public class BaseClientV2 {
 			connection.setRequestMethod("DELETE");
 						
 			int responseCode = connection.getResponseCode();
-			System.out.println("DELETE Response Code :: " + responseCode);
+			System.out.println("> DELETE Response Code :: " + responseCode);
 			ObjectMapper objectMapper = new ObjectMapper();
 			switch (responseCode) {
 				case HttpURLConnection.HTTP_NO_CONTENT:
-					System.out.println("> Delete is done");
+					System.out.println("Delete is done");
 					break;
-				case HttpURLConnection.HTTP_SERVER_ERROR:
+				case HttpURLConnection.HTTP_INTERNAL_ERROR:
 					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
 					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
-				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-					throw new IOException("Failed to connect with " + url + " because the request took too long");	
 				default:
 					throw new IOException("Failed to connect with " + url);
 			}
@@ -139,7 +133,7 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		}
 		
-		System.out.println("==");
+		System.out.println();
 	}
 	
 	/* ******************************************************************************************************** */	
@@ -159,19 +153,17 @@ public class BaseClientV2 {
 			outputStream.flush();
 			
 			int responseCode = connection.getResponseCode();
-			System.out.println("PUT Response Code :: " + responseCode);
+			System.out.println("> PUT Response Code :: " + responseCode);
 			switch (responseCode) {
 				case HttpURLConnection.HTTP_NO_CONTENT:
-					System.out.println("> Payload is sent successfully");
+					System.out.println("Payload is sent successfully");
 					break;
 				case HttpURLConnection.HTTP_BAD_REQUEST:
 					Object errorBodyWithBadRequest = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
 					throw new IOException("Sent payload is not valid: " + errorBodyWithBadRequest);
-				case HttpURLConnection.HTTP_SERVER_ERROR:
+				case HttpURLConnection.HTTP_INTERNAL_ERROR:
 					Object errorBodyWithServerError = objectMapper.readValue((InputStream) connection.getErrorStream(), Object.class);
-					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);
-				case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-					throw new IOException("Failed to connect with " + url + " because the request took too long");	
+					throw new IOException("Failed to connect with " + url + " due to " + errorBodyWithServerError);	
 				default:
 					throw new IOException("Failed to connect with " + url);
 			}
@@ -183,8 +175,8 @@ public class BaseClientV2 {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
-		
-		System.out.println("==");
+	
+		System.out.println();
 	}
 		
 }
