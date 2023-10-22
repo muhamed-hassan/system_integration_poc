@@ -1,4 +1,4 @@
-package poc.interfaces.rest.error_handler;
+package poc.web.error_handler;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package poc.interfaces.rest.controllers;
+package poc.web.controllers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import poc.interfaces.rest.models.NewEmployee;
-import poc.interfaces.rest.models.SavedEmployee;
 import poc.persistence.entities.Employee;
 import poc.persistence.repositories.EmployeeRepository;
+import poc.web.models.NewEmployee;
+import poc.web.models.SavedEmployee;
 
 @RestController
 @RequestMapping("v2/employees")

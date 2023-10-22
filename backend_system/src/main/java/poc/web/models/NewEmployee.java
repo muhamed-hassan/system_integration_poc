@@ -1,4 +1,4 @@
-package poc.interfaces.rest.models;
+package poc.web.models;
 
 public class NewEmployee {
 
