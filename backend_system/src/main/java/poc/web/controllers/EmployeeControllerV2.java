@@ -1,10 +1,8 @@
 package poc.web.controllers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,7 @@ import poc.persistence.entities.Employee;
 import poc.persistence.repositories.EmployeeRepository;
 import poc.web.models.NewEmployee;
 import poc.web.models.SavedEmployee;
+import poc.web.validators.Validator;
 
 @RestController
 @RequestMapping("v2/employees")
@@ -28,6 +27,9 @@ public class EmployeeControllerV2 {
 	
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
+	@Autowired
+	private Validator validator;
 		
 	@RequestMapping(method = RequestMethod.GET, value = "{id}")
 	public ResponseEntity<SavedEmployee> findById(@PathVariable int id) {
@@ -76,12 +78,7 @@ public class EmployeeControllerV2 {
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<Object> save(@RequestBody NewEmployee newEmployee) {
 		
-		String errorMessage = validate(newEmployee);
-		if (errorMessage != null) {			
-			Map<String, String> error = new HashMap<String, String>(1);
-			error.put("error", errorMessage);			
-			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
-		}
+		validator.validate(newEmployee);
 		
 		Employee employeeEntity = new Employee();
 		employeeEntity.setName(newEmployee.getName());
@@ -120,12 +117,7 @@ public class EmployeeControllerV2 {
 	@RequestMapping(method = RequestMethod.PUT, value = "{id}")
 	public ResponseEntity<Object> updateById(@PathVariable int id, @RequestBody NewEmployee newEmployee) {
 		
-		String errorMessage = validate(newEmployee);
-		if (errorMessage != null) {			
-			Map<String, String> error = new HashMap<String, String>(1);
-			error.put("error", errorMessage);			
-			return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
-		}
+		validator.validate(newEmployee);
 		
 		Employee employeeEntity = new Employee();
 		employeeEntity.setId(id);
@@ -143,33 +135,6 @@ public class EmployeeControllerV2 {
 		if (true) {
 			throw new RuntimeException("forced exception => doServerErrorWithPUT()");
 		}
-	}
-	
-	/* ******************************************************************************************************** */
-	/* ******************************************************************************************************** */
-	// https://en.wikipedia.org/wiki/Fail-fast approach is used to report validation errors
-	
-	private String validate(NewEmployee newEmployee) {
-	
-		String name = newEmployee.getName();
-		if (name == null) {
-			return "name is required";
-		}
-		name = name.trim();
-		if (name.length() == 0) {
-			return "name is required";
-		}		
-		
-		String title = newEmployee.getTitle();
-		if (title == null) {
-			return "title is required";
-		}
-		title = title.trim();
-		if (title.length() == 0) {
-			return "title is required";
-		}
-		
-		return null;
 	}
 
 }

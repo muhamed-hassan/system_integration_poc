@@ -12,6 +12,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class RestErrorHandler {
 	
 	@ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException exception) {
+		
+		String message = exception.getMessage();
+		
+		Map<String, String> error = new HashMap<String, String>(1);
+		error.put("error", message);
+		
+		return new ResponseEntity<Map<String, String>>(error, HttpStatus.BAD_REQUEST);		
+	}
+	
+	@ExceptionHandler
     public ResponseEntity<Map<String, String>> handleExceptions(Exception exception) {
 		
 		String message = exception.getMessage() == null ? 
