@@ -25,11 +25,12 @@ public class BaseClientV2 {
 	
 	protected Object get(String requestPath, Class<? extends Object> responseBodyType) {
 		
+		HttpURLConnection connection = null;
 		Object responseBody = null;		
 		try {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Accept", "application/json");
 			int responseCode = connection.getResponseCode();
@@ -53,7 +54,9 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		} finally {
+			connection.disconnect();
+	    }
 		
 		System.out.println();
 		return responseBody;
@@ -62,10 +65,11 @@ public class BaseClientV2 {
 	/* ******************************************************************************************************** */	
 	protected <T> void post(String requestPath, T payload) {
 		
+		HttpURLConnection connection = null;
 		try {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);			
@@ -97,7 +101,9 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		} finally {
+			connection.disconnect();
+	    }
 		
 		System.out.println();
 	}
@@ -105,10 +111,11 @@ public class BaseClientV2 {
 	/* ******************************************************************************************************** */	
 	protected void delete(String requestPath) {
 		
+		HttpURLConnection connection = null;
 		try {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("DELETE");
 						
 			int responseCode = connection.getResponseCode();
@@ -131,7 +138,9 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		} finally {
+			connection.disconnect();
+	    }
 		
 		System.out.println();
 	}
@@ -139,10 +148,11 @@ public class BaseClientV2 {
 	/* ******************************************************************************************************** */	
 	protected <T> void put(String requestPath, T payload) {
 		
+		HttpURLConnection connection = null;
 		try {
 			
 			URL url = new URL(backendSystemBaseUrl + requestPath);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("PUT");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);			
@@ -174,7 +184,9 @@ public class BaseClientV2 {
 			System.out.println(e.getMessage());
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		} finally {
+			connection.disconnect();
+	    }
 	
 		System.out.println();
 	}
