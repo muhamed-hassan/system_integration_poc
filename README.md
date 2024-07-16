@@ -6,4 +6,5 @@
 
 ***
 
-![Vector-495300389-2-1](https://user-images.githubusercontent.com/17825804/221248963-cc1094ea-c448-46c4-b625-096c13a84417.png)
+![black_company___glittering_stone_by_misticon_dhryge0-fullview](https://github.com/user-attachments/assets/b94f8c7c-90fa-40a4-b284-470340938bb2)
+
