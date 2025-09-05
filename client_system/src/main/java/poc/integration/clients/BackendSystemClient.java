@@ -2,11 +2,17 @@ package poc.integration.clients;
 
 import java.util.List;
 
+import com.lib.integration.HttpClient;
+
 import poc.integration.models.NewEmployee;
 import poc.integration.models.SavedEmployee;
 
-public class BackendSystemClientV2 extends BaseClientV2 {
+public class BackendSystemClient extends HttpClient {
 	
+	public BackendSystemClient() {
+		super("http://localhost:8080/");
+	}
+
 	private static final String SERVER_ERROR_REQUEST_PATH = "v2/employees/server_error";
 	
 	public SavedEmployee findById() {
