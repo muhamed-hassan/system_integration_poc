@@ -13,14 +13,14 @@ public class BackendSystemClient extends HttpClient {
 		super("http://localhost:8080/");
 	}
 
-	private static final String SERVER_ERROR_REQUEST_PATH = "v2/employees/server_error";
+	private static final String SERVER_ERROR_REQUEST_PATH = "employees/server_error";
 	
 	public SavedEmployee findById() {
-		return (SavedEmployee) get("v2/employees/1", SavedEmployee.class);
+		return (SavedEmployee) get("employees/1", SavedEmployee.class);
 	}	
 	
 	public List<SavedEmployee> findByPage() {
-		return (List<SavedEmployee>) get("v2/employees?pageNumber=1&pageSize=10", List.class);
+		return (List<SavedEmployee>) get("employees?pageNumber=1&pageSize=10", List.class);
 	}
 	
 	public void getWithServerError() {
@@ -32,14 +32,14 @@ public class BackendSystemClient extends HttpClient {
 		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
-		post("v2/employees", employee);
+		post("employees", employee);
 	}
 	
 	public void saveWithViolatingPayloadValidations() {
 		NewEmployee employee = new NewEmployee();
 		employee.setName("");
 		employee.setTitle("sample title");
-		post("v2/employees", employee);
+		post("employees", employee);
 	}
 	
 	public void postWithServerError() {
@@ -51,7 +51,7 @@ public class BackendSystemClient extends HttpClient {
 	
 	/* ******************************************************************************************************** */	
 	public void deleteById() {
-		delete("v2/employees/51");
+		delete("employees/51");
 	}
 	
 	public void deleteWithServerError() {
@@ -63,14 +63,14 @@ public class BackendSystemClient extends HttpClient {
 		NewEmployee employee = new NewEmployee();
 		employee.setName("sample name");
 		employee.setTitle("sample title");
-		put("v2/employees/91", employee);
+		put("employees/91", employee);
 	}
 	
 	public void updateByIdWithViolatingPayloadValidations() {
 		NewEmployee employee = new NewEmployee();
 		employee.setName("");
 		employee.setTitle("sample title");
-		put("v2/employees/91", employee);
+		put("employees/91", employee);
 	}
 	
 	public void putWithServerError() {

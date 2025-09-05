@@ -22,8 +22,8 @@ import poc.web.models.SavedEmployee;
 import poc.web.validators.Validator;
 
 @RestController
-@RequestMapping("v2/employees")
-public class EmployeeControllerV2 {
+@RequestMapping("employees")
+public class EmployeeController {
 	
 	@Autowired
 	private EmployeeRepository employeeRepository;
